@@ -1,0 +1,14 @@
+{
+    "PUERTO_MEMORIA": 8002,
+    "IP_MEMORIA": "127.0.0.1",
+    "TAM_MEMORIA": 2048,
+    "TAM_PAGINA": 32,
+    "ENTRADAS_POR_TABLA": 4,
+    "CANTIDAD_NIVELES": 3,
+    "RETARDO_MEMORIA": 500,
+    "SWAPFILE_PATH": "swap/swapfile.bin",
+    "RETARDO_SWAP": 5000,
+    "LOG_LEVEL": "INFO",
+    "DUMP_PATH": "dump/",
+    "SCRIPTS_PATH": "scripts/"
+}

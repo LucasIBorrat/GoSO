@@ -1,0 +1,162 @@
+Comando para cambiar las IPs de todos los archivos de CONFIG (cambiar las IP 192.168.X.Y dependiendo el valor que nos de IFCONFIG)
+
+sed -i 's/"IP_CPU": *"127\.0\.0\.1"/"IP_CPU": "192.168.0.127"/g' *.json
+sed -i 's/"IP_MEMORIA": *"127\.0\.0\.1"/"IP_MEMORIA": "192.168.0.190"/g' *.json
+sed -i 's/"IP_KERNEL": *"127\.0\.0\.1"/"IP_KERNEL": "192.168.0.107"/g' *.json
+sed -i 's/"IP_IO": *"127\.0\.0\.1"/"IP_IO": "192.168.0.107"/g' *.json
+
+------------------------------------------------------------------------------------------------
+
+go build -o ./bin/memoria ./cmd/memoria
+go build -o ./bin/kernel ./cmd/kernel
+go build -o ./bin/cpu ./cmd/cpu
+go build -o ./bin/io ./cmd/io
+
+######################################
+
+PRUEBA PLANI CORTO PLAZO (3 KERNEL DIFERENTES EN DISTINTO TIEMPO)
+V1
+
+# Terminal 1: Memoria
+./bin/memoria configs/memoria-config-PlaniCorto.json
+# Terminal 2: IO
+./bin/io DISCO1 configs/io1-config-PlaniCorto.json
+# Terminal 3: CPU 1
+./bin/cpu CPU1 configs/cpu1-config-PlaniCorto.json
+# Terminal 4: CPU 2
+./bin/cpu CPU2 configs/cpu2-config-PlaniCorto.json
+# Terminal 5: Kernel
+./bin/kernel configs/kernel-config-PlaniCortoFIFO.json scripts/PLANI_CORTO_PLAZO 0
+
+Luego levantar IO2 cuando hay procesos infinitos
+# Terminal 6: IO 2
+./bin/io DISCO2 configs/io2-config-PlaniCorto.json
+Matar las dos IO luego de detectar que se esten usando
+
+
+v2 
+# Terminal 1: Memoria
+./bin/memoria configs/memoria-config-PlaniCorto.json
+# Terminal 2: IO
+./bin/io DISCO1 configs/io1-config-PlaniCorto.json
+# Terminal 3: CPU 1
+./bin/cpu CPU1 configs/cpu1-config-PlaniCorto.json
+# Terminal 4: Kernel
+./bin/kernel configs/kernel-config-PlaniCortoSJF.json scripts/PLANI_CORTO_PLAZO 0
+Matar IO luego de que haya procesos infinitos
+
+v3
+# Terminal 1: Memoria
+./bin/memoria configs/memoria-config-PlaniCorto.json
+# Terminal 2: IO
+./bin/io DISCO1 configs/io1-config-PlaniCorto.json
+# Terminal 3: CPU 1
+./bin/cpu CPU1 configs/cpu1-config-PlaniCorto.json
+# Terminal 4: Kernel
+./bin/kernel configs/kernel-config-PlaniCortoSRT.json scripts/PLANI_CORTO_PLAZO 0
+Matar IO luego de que haya procesos infinitos
+
+
+
+PRUEBA PLANI MED/LARGO PLAZO (2 KERNEL DIFERENTES EN DISTINTO TIEMPO)
+v1
+# Terminal 1: Memoria
+./bin/memoria configs/memoria-config-PlaniMedianoLargo.json
+# Terminal 2: IO
+./bin/io DISCO1 configs/io1-config-BASE.json
+# Terminal 3: CPU 1
+./bin/cpu CPU1 configs/cpu1-config-PlaniMedianoLargo.json
+# Terminal 4: Kernel
+./bin/kernel configs/kernel-config-PlaniMedianoLargoFIFO.json scripts/PLANI_LYM_PLAZO 0
+
+v2
+# Terminal 1: Memoria
+./bin/memoria configs/memoria-config-PlaniMedianoLargo.json
+# Terminal 2: IO
+./bin/io DISCO1 configs/io1-config-BASE.json
+# Terminal 3: CPU 1
+./bin/cpu CPU1 configs/cpu1-config-PlaniMedianoLargo.json
+# Terminal 4: Kernel
+./bin/kernel configs/kernel-config-PlaniMedianoLargoPMCP.json scripts/PLANI_LYM_PLAZO 0
+
+
+
+Prueba Memoria SWAP
+# Terminal 1: Memoria
+./bin/memoria configs/memoria-config-MemoriaSWAP.json
+# Terminal 2: IO
+./bin/io DISCO1 configs/io1-config-BASE.json
+# Terminal 3: CPU 1
+./bin/cpu CPU1 configs/cpu1-config-MemoriaSWAP.json
+# Terminal 4: Kernel
+./bin/kernel configs/kernel-config-MemoriaSWAP.json scripts/MEMORIA_IO 90
+
+
+
+Prueba Memoria Cache
+v1 CLOCK
+# Terminal 1: Memoria
+./bin/memoria configs/memoria-config-MemoriaCache.json
+# Terminal 2: IO
+./bin/io DISCO1 configs/io1-config-BASE.json
+# Terminal 3: CPU 1
+./bin/cpu CPU1 configs/cpu1-config-MemoriaCache.json
+# Terminal 4: Kernel
+./bin/kernel configs/kernel-config-MemoriaCache.json scripts/MEMORIA_BASE 256
+
+v2 CLOCK-M
+# Terminal 1: Memoria
+./bin/memoria configs/memoria-config-MemoriaCache.json
+# Terminal 2: IO
+./bin/io DISCO1 configs/io1-config-BASE.json
+# Terminal 3: CPU 1
+./bin/cpu CPU1 configs/cpu2-config-MemoriaCache.json
+# Terminal 4: Kernel
+./bin/kernel configs/kernel-config-MemoriaCache.json scripts/MEMORIA_BASE 256
+
+
+
+Prueba Memoria TLB
+v1 FIFO
+# Terminal 1: Memoria
+./bin/memoria configs/memoria-config-TLB.json
+# Terminal 2: IO
+./bin/io DISCO1 configs/io1-config-BASE.json
+# Terminal 3: CPU 1
+./bin/cpu CPU1 configs/cpu1-config-TLB.json
+# Terminal 4: Kernel
+./bin/kernel configs/kernel-config-TLB.json scripts/MEMORIA_BASE_TLB 256
+
+v2 LRU
+# Terminal 1: Memoria
+./bin/memoria configs/memoria-config-TLB.json
+# Terminal 2: IO
+./bin/io DISCO1 configs/io1-config-BASE.json
+# Terminal 3: CPU 1
+./bin/cpu CPU1 configs/cpu2-config-TLB.json
+# Terminal 4: Kernel
+./bin/kernel configs/kernel-config-TLB.json scripts/MEMORIA_BASE_TLB 256
+
+
+
+Prueba Estabilidad General
+# Terminal 1: Memoria
+./bin/memoria configs/memoria-config-EstabilidadGeneral.json
+# Terminal 2: IO1
+./bin/io DISCO1 configs/io1-config-EstabilidadGeneral.json
+# Terminal 3: IO2
+./bin/io DISCO2 configs/io2-config-EstabilidadGeneral.json
+# Terminal 4: IO3
+./bin/io DISCO3 configs/io3-config-EstabilidadGeneral.json
+# Terminal 5: IO4
+./bin/io DISCO4 configs/io4-config-EstabilidadGeneral.json
+# Terminal 6: CPU 1
+./bin/cpu CPU1 configs/cpu1-config-EstabilidadGeneral.json
+# Terminal 7: CPU 2
+./bin/cpu CPU2 configs/cpu2-config-EstabilidadGeneral.json
+# Terminal 8: CPU 3
+./bin/cpu CPU3 configs/cpu3-config-EstabilidadGeneral.json
+# Terminal 9: CPU 4
+./bin/cpu CPU4 configs/cpu4-config-EstabilidadGeneral.json
+# Terminal 10: Kernel
+./bin/kernel configs/kernel-config-EstabilidadGeneral.json scripts/ESTABILIDAD_GENERAL 0
